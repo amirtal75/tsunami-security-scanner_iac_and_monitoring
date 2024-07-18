@@ -98,7 +98,7 @@ variable "github_actions_policy_name" {
   default     = "github-actions-policy"
 }
 
-variable "my-terraform-plan-block-apply-bucket" {
+variable "my_terraform_plan_block_apply_bucket" {
   description = "Bucket for overriding github download and upload artifact to implement a uuid based terraform-plan and apply-"
   type        = string
   default     = "my-terraform-plan-block-apply-bucket"
@@ -114,4 +114,22 @@ variable "aws_iam_eks_user" {
   description = "user to be a member of aws_iam_eks_group_name"
   type        = string
   default     = "eks_user"
+}
+
+variable "sqs_queue_name" {
+  description = "The name of the SQS queue that will contain ip list that the tsunami scan will additionally check in each run"
+  type        = string
+  default     = "tsunami_ip_list_queue"
+}
+
+variable "sqs_visibility_timeout_seconds" {
+  description = "The visibility timeout for the SQS queue"
+  type        = number
+  default     = 30
+}
+
+variable "sqs_message_retention_seconds" {
+  description = "The number of seconds to retain a message in the SQS queue"
+  type        = number
+  default     = 86400 # 1 days
 }

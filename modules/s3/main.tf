@@ -1,5 +1,5 @@
 resource "aws_s3_bucket" "this" {
-  bucket = var.my-terraform-plan-block-apply-bucket
+  bucket = var.my_terraform_plan_block_apply_bucket
   tags = var.tags
 }
 
@@ -13,8 +13,8 @@ resource "aws_s3_bucket_policy" "this" {
         Principal = "*",
         Action = "s3:*",
         Resource = [
-          "arn:aws:s3:::${var.my-terraform-plan-block-apply-bucket}",
-          "arn:aws:s3:::${var.my-terraform-plan-block-apply-bucket}/*"
+          "arn:aws:s3:::${var.my_terraform_plan_block_apply_bucket}",
+          "arn:aws:s3:::${var.my_terraform_plan_block_apply_bucket}/*"
         ],
         Condition = {
           Bool: {

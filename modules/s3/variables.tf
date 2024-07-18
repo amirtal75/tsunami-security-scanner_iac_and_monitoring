@@ -1,4 +1,4 @@
-variable "my-terraform-plan-block-apply-bucket" {
+variable "my_terraform_plan_block_apply_bucket" {
   description = "The name of the S3 bucket"
   type        = string
 }

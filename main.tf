@@ -1,3 +1,10 @@
+module "sqs" {
+  source = "./modules/sqs"
+  queue_name = var.sqs_queue_name
+  visibility_timeout_seconds = var.sqs_visibility_timeout_seconds
+  message_retention_seconds = var.sqs_message_retention_seconds
+}
+
 module "s3" {
   source = "./modules/s3"
 
@@ -7,7 +14,7 @@ module "s3" {
     Environment = "Dev"
     Project     = "TerraformPlanBlock"
   }
-  my-terraform-plan-block-apply-bucket = "my-terraform-plan-block-apply-bucket"
+  my_terraform_plan_block_apply_bucket = "my-terraform-plan-block-apply-bucket"
 }
 
 module "vpc" {

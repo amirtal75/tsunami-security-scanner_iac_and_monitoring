@@ -11,6 +11,6 @@ node_group_name                       = "tsunami-node-group"
 desired_size                          = 2
 max_size                              = 2
 min_size                              = 1
-my-terraform-plan-block-apply-bucket  = "my-terraform-plan-block-apply-bucket"
+my_terraform_plan_block_apply_bucket  = "my-terraform-plan-block-apply-bucket"
 aws_iam_eks_group_name                = "eks_access"
 aws_iam_eks_user                      = "eks_user"
