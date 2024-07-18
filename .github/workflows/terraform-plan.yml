@@ -39,4 +39,4 @@ jobs:
 
       - name: Upload Plan to S3
         run: |
-          aws s3 cp plan.out s3://my-terraform-plan-block-apply-bucket-github/${{ steps.uuid.outputs.uuid }}-plan.out
+          aws s3 cp plan.out s3://my-terraform-plan-block-apply-bucket/${{ steps.uuid.outputs.uuid }}-plan.out

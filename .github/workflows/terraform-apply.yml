@@ -35,7 +35,7 @@ jobs:
 
       - name: Download Plan from S3
         run: |
-          aws s3 cp s3://my-terraform-plan-block-apply-bucket-github/${{ github.event.inputs.uuid }}-plan.out plan.out
+          aws s3 cp s3://my-terraform-plan-block-apply-bucket/${{ github.event.inputs.uuid }}-plan.out plan.out
 
       - name: Terraform Apply
         run: terraform apply plan.out
