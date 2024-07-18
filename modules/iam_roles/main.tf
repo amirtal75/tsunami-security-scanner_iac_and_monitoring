@@ -33,10 +33,6 @@ resource "aws_iam_user_group_membership" "eks_user_membership" {
   ]
 }
 
-resource "aws_iam_access_key" "eks_user_key" {
-  user = aws_iam_user.eks_user.name
-}
-
 resource "aws_iam_role" "eks_cluster_role" {
   name = "eks_cluster_role"
   assume_role_policy = jsonencode({

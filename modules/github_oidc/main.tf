@@ -53,3 +53,28 @@ resource "aws_iam_role_policy_attachment" "github_actions_attachment" {
   role       = aws_iam_role.github_actions_role.name
   policy_arn = aws_iam_policy.github_actions_policy.arn
 }
+
+resource "kubernetes_service_account" "github_actions" {
+  metadata {
+    name = "github-actions"
+    annotations = {
+      "eks.amazonaws.com/role-arn" = aws_iam_role.github_actions_role.arn
+    }
+  }
+}
+
+resource "kubernetes_cluster_role_binding" "github_actions" {
+  metadata {
+    name = "github-actions-binding"
+  }
+  role_ref {
+    api_group = "rbac.authorization.k8s.io"
+    kind      = "ClusterRole"
+    name      = "cluster-admin"
+  }
+  subject {
+    kind      = "ServiceAccount"
+    name      = kubernetes_service_account.github_actions.metadata[0].name
+    namespace = kubernetes_service_account.github_actions.metadata[0].namespace
+  }
+}
