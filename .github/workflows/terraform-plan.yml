@@ -7,19 +7,41 @@ jobs:
   plan:
     runs-on: ubuntu-latest
 
-    permissions:
-      id-token: write
-      contents: read
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v2
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
         with:
-          role-to-assume: arn:aws:iam::654654392619:role/github-actions-role
-          aws-region: us-west-2
+          node-version: '16'
+
+      - name: Install AWS SDK v3
+        run: npm install @aws-sdk/client-sts
+
+      - name: Configure AWS credentials using AWS SDK v3
+        id: aws-credentials
+        run: |
+          node <<EOF
+          const { STSClient, AssumeRoleCommand } = require("@aws-sdk/client-sts");
+          const client = new STSClient({ region: "us-west-2" });
+          const assumeRoleCommand = new AssumeRoleCommand({
+            RoleArn: "arn:aws:iam::654654392619:role/github-actions-role",
+            RoleSessionName: "GitHubActions",
+          });
+          client.send(assumeRoleCommand).then(data => {
+            console.log(`::set-output name=aws_access_key_id::${data.Credentials.AccessKeyId}`);
+            console.log(`::set-output name=aws_secret_access_key::${data.Credentials.SecretAccessKey}`);
+            console.log(`::set-output name=aws_session_token::${data.Credentials.SessionToken}`);
+          });
+          EOF
+
+      - name: Configure AWS CLI
+        run: |
+          aws configure set aws_access_key_id ${{ steps.aws-credentials.outputs.aws_access_key_id }}
+          aws configure set aws_secret_access_key ${{ steps.aws-credentials.outputs.aws_secret_access_key }}
+          aws configure set aws_session_token ${{ steps.aws-credentials.outputs.aws_session_token }}
+          aws configure set region us-west-2
 
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v1
