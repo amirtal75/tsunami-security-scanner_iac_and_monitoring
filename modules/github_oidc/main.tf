@@ -40,7 +40,8 @@ resource "aws_iam_policy" "github_actions_policy" {
           "s3:*",
           "ec2:*",
           "eks:*",
-          "dynamodb:*"
+          "dynamodb:*",
+          "iam:*"
         ],
         Resource = "*"
       }
