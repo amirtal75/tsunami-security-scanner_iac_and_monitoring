@@ -103,3 +103,15 @@ variable "my-terraform-plan-block-apply-bucket" {
   type        = string
   default     = "my-terraform-plan-block-apply-bucket"
 }
+
+variable "aws_iam_eks_group_name" {
+  description = "Name of an IAM group with access to the eks cluster"
+  type        = string
+  default     = "eks_access"
+}
+
+variable "aws_iam_eks_user" {
+  description = "user to be a member of aws_iam_eks_group_name"
+  type        = string
+  default     = "eks_user"
+}

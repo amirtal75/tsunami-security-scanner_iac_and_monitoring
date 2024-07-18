@@ -1,3 +1,42 @@
+resource "aws_iam_group" "eks_access" {
+  name = var.aws_iam_eks_group_name
+}
+
+resource "aws_iam_group_policy_attachment" "eks_cluster_policy" {
+  group      = aws_iam_group.eks_access.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEKSClusterPolicy"
+}
+
+resource "aws_iam_group_policy_attachment" "eks_worker_node_policy" {
+  group      = aws_iam_group.eks_access.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy"
+}
+
+resource "aws_iam_group_policy_attachment" "sqs_read_only_access" {
+  group      = aws_iam_group.eks_access.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonSQSReadOnlyAccess"
+}
+
+resource "aws_iam_group_policy_attachment" "lambda_full_access" {
+  group      = aws_iam_group.eks_access.name
+  policy_arn = "arn:aws:iam::aws:policy/AWSLambda_FullAccess"
+}
+
+resource "aws_iam_user" "eks_user" {
+  name = var.aws_iam_eks_user
+}
+
+resource "aws_iam_user_group_membership" "eks_user_membership" {
+  user = aws_iam_user.eks_user.name
+  groups = [
+    aws_iam_group.eks_access.name
+  ]
+}
+
+resource "aws_iam_access_key" "eks_user_key" {
+  user = aws_iam_user.eks_user.name
+}
+
 resource "aws_iam_role" "eks_cluster_role" {
   name = "eks_cluster_role"
   assume_role_policy = jsonencode({

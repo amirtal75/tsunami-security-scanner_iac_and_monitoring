@@ -26,6 +26,8 @@ module "vpc" {
 module "iam_roles" {
   source = "./modules/iam_roles"
   aws_region = var.aws_region
+  aws_iam_eks_group_name = var.aws_iam_eks_group_name
+  aws_iam_eks_user = var.aws_iam_eks_user
 }
 
 module "eks" {
