@@ -1,3 +1,15 @@
+module "s3" {
+  source = "./modules/s3"
+
+  retention_hours = 24
+
+  tags = {
+    Environment = "Dev"
+    Project     = "TerraformPlanBlock"
+  }
+  my-terraform-plan-block-apply-bucket = "my-terraform-plan-block-apply-bucket"
+}
+
 module "vpc" {
   source = "./modules/vpc"
   

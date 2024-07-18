@@ -11,5 +11,4 @@ node_group_name      = "tsunami-node-group"
 desired_size         = 2
 max_size             = 2
 min_size             = 1
-github_actions_role_name = "github-actions-role"
-github_actions_policy_name = "github-actions-policy"
+my-terraform-plan-block-apply-bucket ="my-terraform-plan-block-apply-bucket"

@@ -97,3 +97,9 @@ variable "github_actions_policy_name" {
   type        = string
   default     = "github-actions-policy"
 }
+
+variable "my-terraform-plan-block-apply-bucket" {
+  description = "Bucket for overriding github download and upload artifact to implement a uuid based terraform-plan and apply-"
+  type        = string
+  default     = "my-terraform-plan-block-apply-bucket"
+}
