@@ -29,12 +29,14 @@ jobs:
       - name: Initialize Terraform
         run: terraform init
 
+      - name: Generate UUID
+        id: uuid
+        run: echo "::set-output name=uuid::$(uuidgen)"
+
       - name: Terraform Plan
         id: plan
         run: terraform plan -out=plan.out
 
-      - name: Upload Plan
-        uses: actions/upload-artifact@v2
-        with:
-          name: terraform-plan-${{ github.run_id }}
-          path: plan.out
+      - name: Upload Plan to S3
+        run: |
+          aws s3 cp plan.out s3://my-terraform-plan-block-apply-bucket-github-override/${{ steps.uuid.outputs.uuid }}-plan.out

@@ -3,8 +3,8 @@ name: Terraform Apply
 on:
   workflow_dispatch:
     inputs:
-      run_id:
-        description: 'The run ID of the Terraform Plan to apply'
+      uuid:
+        description: 'UUID of the Terraform plan to apply'
         required: true
 
 jobs:
@@ -25,12 +25,6 @@ jobs:
           role-to-assume: arn:aws:iam::654654392619:role/github-actions-role
           aws-region: us-west-2
 
-      - name: Download Plan
-        uses: actions/download-artifact@v2
-        with:
-          name: terraform-plan-${{ github.event.inputs.run_id }}
-          path: ./plan.out
-
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v1
         with:
@@ -39,5 +33,9 @@ jobs:
       - name: Initialize Terraform
         run: terraform init
 
+      - name: Download Plan from S3
+        run: |
+          aws s3 cp s3://my-terraform-plan-block-apply-bucket-github-override/${{ github.event.inputs.uuid }}-plan.out plan.out
+
       - name: Terraform Apply
-        run: terraform apply ./plan.out
+        run: terraform apply plan.out
