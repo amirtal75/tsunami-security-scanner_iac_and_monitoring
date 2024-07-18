@@ -133,3 +133,9 @@ variable "sqs_message_retention_seconds" {
   type        = number
   default     = 86400 # 1 days
 }
+
+variable "sre_bucket" {
+  description = "Bucket for overriding github download and upload artifact to implement a uuid based terraform-plan and apply-"
+  type        = string
+  default     = "sre-uuid-not-generated"
+}

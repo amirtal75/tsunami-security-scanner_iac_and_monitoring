@@ -14,3 +14,6 @@ min_size                              = 1
 my_terraform_plan_block_apply_bucket  = "my-terraform-plan-block-apply-bucket"
 aws_iam_eks_group_name                = "eks_access"
 aws_iam_eks_user                      = "eks_user"
+sqs_queue_name = "tsunami_ip_list_queue"
+sqs_visibility_timeout_seconds = 30
+sqs_message_retention_seconds = 84600

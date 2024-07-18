@@ -14,7 +14,8 @@ module "s3" {
     Environment = "Dev"
     Project     = "TerraformPlanBlock"
   }
-  my_terraform_plan_block_apply_bucket = "my-terraform-plan-block-apply-bucket"
+  my_terraform_plan_block_apply_bucket = "${var.my_terraform_plan_block_apply_bucket}-${random_id.bucket_suffix.hex}"
+  sre_bucket = "${var.sre_bucket}-${random_id.bucket_suffix.hex}"
 }
 
 module "vpc" {
@@ -60,4 +61,8 @@ module "github_oidc" {
   github_repo_name       = var.github_repo_name
   github_actions_role_name = var.github_actions_role_name
   github_actions_policy_name = var.github_actions_policy_name
+}
+
+resource "random_id" "bucket_suffix" {
+  byte_length = 4
 }

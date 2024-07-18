@@ -14,3 +14,8 @@ variable "tags" {
   type        = map(string)
   default     = {}
 }
+
+variable "sre_bucket" {
+  description = "The name of the S3 bucket"
+  type        = string
+}
