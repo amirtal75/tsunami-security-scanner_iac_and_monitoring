@@ -21,6 +21,7 @@ jobs:
       with:
         role-to-assume: arn:aws:iam::654654392619:role/github-actions-role
         aws-region: us-west-2
+
     - name: Update kubeconfig
       run: aws eks update-kubeconfig --name TsunamiClusterTest --region us-west-2
 

@@ -41,7 +41,8 @@ resource "aws_iam_policy" "github_actions_policy" {
           "ec2:*",
           "eks:*",
           "dynamodb:*",
-          "iam:*"
+          "iam:*",
+          "sqs:*"
         ],
         Resource = "*"
       }
@@ -61,6 +62,11 @@ resource "kubernetes_service_account" "github_actions" {
       "eks.amazonaws.com/role-arn" = aws_iam_role.github_actions_role.arn
     }
   }
+}
+
+resource "aws_iam_role_policy_attachment" "eks_service_policy" {
+  role       = aws_iam_role.github_actions_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEKSServicePolicy"
 }
 
 resource "kubernetes_cluster_role_binding" "github_actions" {
