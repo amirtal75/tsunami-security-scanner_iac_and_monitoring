@@ -1,0 +1,1 @@
+{"s3_bucket_arn": "arn:aws:s3:::my-terraform-state-bucket-4cb48d9f", "dynamodb_table_arn": "arn:aws:dynamodb:us-west-2:654654392619:table/terraform-state-lock-4cb48d9f"}
