@@ -13,7 +13,7 @@ bucket_name = f'my-terraform-state-bucket-{unique_id}'
 dynamodb_table_name = f'terraform-state-lock-{unique_id}'
 resource_arn_file = 'resource_arns.json'
 backend_tf_template_path = 'backend.tf.template'
-backend_tf_path = 'backend.tf'
+backend_tf_path = f'{os.path.dirname(os.getcwd())}/backend.tf'
 
 # Initialize AWS clients
 s3_client = boto3.client('s3', region_name=aws_region)
