@@ -1,0 +1,40 @@
+name: EKS Permissions Check
+
+on:
+  workflow_dispatch:
+
+jobs:
+  check-permissions:
+    runs-on: ubuntu-latest
+
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v2
+      with:
+        role-to-assume: arn:aws:iam::654654392619:role/github-actions-role
+        aws-region: us-west-2
+
+    - name: Update kubeconfig
+      run: aws eks update-kubeconfig --name TsunamiClusterTest --region us-west-2
+
+    - name: Install Helm
+      run: |
+        curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+    - name: Add KEDA Helm repository
+      run: helm repo add kedacore https://kedacore.github.io/charts
+
+    - name: Update Helm repositories
+      run: helm repo update
+
+    - name: Install KEDA
+      run: helm install keda kedacore/keda --namespace keda --create-namespace
+
+    - name: Verify KEDA installation
+      run: kubectl get pods -n keda
