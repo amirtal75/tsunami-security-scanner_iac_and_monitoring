@@ -24,30 +24,41 @@ resource "aws_eks_node_group" "node_group" {
   ]
 }
 
-resource "kubernetes_config_map" "aws_auth" {
-  metadata {
-    name      = "aws-auth"
-    namespace = "kube-system"
+resource "aws_security_group" "monitoring_security_group" {
+  depends_on  = [aws_eks_cluster.eks_cluster]
+  name        = "monitoring_security_group"
+  description = "Allow inbound traffic on TCP ports 9090, 8080, and 80"
+  vpc_id      = aws_eks_cluster.eks_cluster.vpc_config[0].vpc_id
+
+  ingress {
+    from_port   = 9090
+    to_port     = 9090
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
-  data = {
-    mapRoles = yamlencode([
-      {
-        groups   = ["system:bootstrappers", "system:nodes"]
-        rolearn  = aws_eks_node_group.node_group.arn
-        username = "system:node:{{EC2PrivateDNSName}}"
-      },
-      {
-        groups   = ["system:masters"]
-        rolearn  = var.github_actions_role_arn
-        username = "github-actions"
-      }
-    ])
+  ingress {
+    from_port   = 8080
+    to_port     = 8080
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
-  depends_on = [
-    aws_eks_cluster.eks_cluster,
-    aws_eks_node_group.node_group,
-    kubernetes_config_map.aws_auth
-  ]
+  ingress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name = "monitoring_security_group"
+  }
 }

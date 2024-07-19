@@ -1,5 +1,6 @@
 prometheus:
   service:
+
     type: LoadBalancer
     labels:
       app: prometheus
@@ -7,6 +8,7 @@ prometheus:
       app: prometheus
     annotations:
       service.beta.kubernetes.io/aws-load-balancer-backend-protocol: "tcp"
+      service.beta.kubernetes.io/aws-load-balancer-security-groups: "<put_the_sg>"
   prometheusSpec:
     serviceMonitorSelectorNilUsesHelmValues: false
     podMonitorSelectorNilUsesHelmValues: false
