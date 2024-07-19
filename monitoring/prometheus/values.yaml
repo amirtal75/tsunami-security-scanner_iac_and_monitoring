@@ -1,0 +1,19 @@
+prometheus:
+  prometheusSpec:
+    serviceMonitorSelectorNilUsesHelmValues: false
+    podMonitorSelectorNilUsesHelmValues: false
+    serviceMonitorSelector:
+      matchLabels:
+        release: prometheus-operator
+    podMonitorSelector:
+      matchLabels:
+        release: prometheus-operator
+    serviceAccountName: prometheus-operator-prometheus
+    service:
+      type: LoadBalancer
+      labels:
+        app: prometheus
+    externalLabels:
+      app: prometheus
+  extraLabels:
+    app: prometheus

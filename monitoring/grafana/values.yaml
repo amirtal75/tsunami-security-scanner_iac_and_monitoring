@@ -1,0 +1,9 @@
+grafana:
+  enabled: true
+  service:
+    type: LoadBalancer
+    labels:
+      app: grafana
+  extraLabels:
+    app: grafana
+  adminPassword: "admin"  # Example: setting the admin password
