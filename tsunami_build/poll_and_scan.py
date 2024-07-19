@@ -31,19 +31,19 @@ def run_tsunami_scan(ip):
     return result.stdout, result.stderr
 
 def main():
-    with open('tf_output.json', 'rb') as file:
-        raw_data = file.read()
-        result = chardet.detect(raw_data)
-        encoding = result['encoding']
-    tfvars ={}
-    with open('tf_output.json', 'r', encoding=encoding) as file:
-        for line in file:
-            # Strip any leading/trailing whitespace and split by '='
-            if '=' in line:
-                key, value = line.strip().split('=', 1)
-                key = key.strip()
-                value = value.strip()
-                tfvars[key] = value
+    # with open('tf_output.json', 'rb') as file:
+    #     raw_data = file.read()
+    #     result = chardet.detect(raw_data)
+    #     encoding = result['encoding']
+    # tfvars ={}
+    # with open('tf_output.json', 'r', encoding=encoding) as file:
+    #     for line in file:
+    #         # Strip any leading/trailing whitespace and split by '='
+    #         if '=' in line:
+    #             key, value = line.strip().split('=', 1)
+    #             key = key.strip()
+    #             value = value.strip()
+    #             tfvars[key] = value
     sqs = boto3.client('sqs')
     queue_name = 'tsunami_ip_list_queue'
     try:
