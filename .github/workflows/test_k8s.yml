@@ -1,4 +1,5 @@
 name: EKS Permissions Check
+
 on:
   push:
     branches:
