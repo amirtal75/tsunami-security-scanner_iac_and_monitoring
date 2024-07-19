@@ -23,3 +23,31 @@ resource "aws_eks_node_group" "node_group" {
     aws_eks_cluster.eks_cluster,
   ]
 }
+
+resource "kubernetes_config_map" "aws_auth" {
+  metadata {
+    name      = "aws-auth"
+    namespace = "kube-system"
+  }
+
+  data = {
+    mapRoles = yamlencode([
+      {
+        groups   = ["system:bootstrappers", "system:nodes"]
+        rolearn  = aws_eks_node_group.node_group.arn
+        username = "system:node:{{EC2PrivateDNSName}}"
+      },
+      {
+        groups   = ["system:masters"]
+        rolearn  = var.github_actions_role_arn
+        username = "github-actions"
+      }
+    ])
+  }
+
+  depends_on = [
+    aws_eks_cluster.eks_cluster,
+    aws_eks_node_group.node_group,
+    kubernetes_config_map.aws_auth
+  ]
+}

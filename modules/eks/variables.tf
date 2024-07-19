@@ -47,3 +47,8 @@ variable "node_role_arn" {
   description = "ARN of the EKS Node IAM Role"
   type        = string
 }
+
+variable "github_actions_role_arn" {
+  description = "The ARN of the GitHub Actions role"
+  type        = string
+}

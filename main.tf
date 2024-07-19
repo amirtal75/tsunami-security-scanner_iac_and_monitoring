@@ -51,6 +51,7 @@ module "eks" {
   vpc_id             = module.vpc.vpc_id
   cluster_role_arn   = module.iam_roles.eks_cluster_role_arn
   node_role_arn      = module.iam_roles.eks_node_role_arn
+  github_actions_role_arn = module.github_oidc.github_actions_role_arn
 }
 
 module "github_oidc" {

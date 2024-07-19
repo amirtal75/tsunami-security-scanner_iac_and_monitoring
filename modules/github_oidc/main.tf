@@ -22,6 +22,13 @@ resource "aws_iam_role" "github_actions_role" {
             "token.actions.githubusercontent.com:sub": "repo:${var.github_username}/${var.github_repo_name}:ref:refs/heads/main"
           }
         }
+      },
+      {
+      "Effect": "Allow",
+      "Principal": {
+        "AWS": "arn:aws:iam::654654392619:user/almalinux"
+      },
+      "Action": "sts:AssumeRole"
       }
     ]
   })
@@ -55,64 +62,17 @@ resource "aws_iam_role_policy_attachment" "github_actions_attachment" {
   policy_arn = aws_iam_policy.github_actions_policy.arn
 }
 
-resource "kubernetes_service_account" "github_actions" {
-  metadata {
-    name = "github-actions"
-    annotations = {
-      "eks.amazonaws.com/role-arn" = aws_iam_role.github_actions_role.arn
-    }
-  }
-}
-
 resource "aws_iam_role_policy_attachment" "eks_service_policy" {
   role       = aws_iam_role.github_actions_role.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKSServicePolicy"
 }
-
-resource "kubernetes_cluster_role_binding" "github_actions" {
-  metadata {
-    name = "github-actions-binding"
-  }
-  role_ref {
-    api_group = "rbac.authorization.k8s.io"
-    kind      = "ClusterRole"
-    name      = "cluster-admin"
-  }
-  subject {
-    kind      = "ServiceAccount"
-    name      = kubernetes_service_account.github_actions.metadata[0].name
-    namespace = kubernetes_service_account.github_actions.metadata[0].namespace
-  }
+resource "aws_iam_role_policy_attachment" "eks_cluster_policy" {
+  role       = aws_iam_role.github_actions_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEKSClusterPolicy"
+}
+resource "aws_iam_role_policy_attachment" "eks_node_policy" {
+  role       = aws_iam_role.github_actions_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy"
 }
 
-resource "kubernetes_cluster_role" "github_actions_role" {
-  metadata {
-    name = "github-actions-role"
-  }
-  rule {
-    api_groups = [""]
-    resources  = ["pods", "services", "deployments", "serviceaccounts", "configmaps"]
-    verbs      = ["create", "delete", "get", "list", "patch", "update", "watch"]
-  }
-  rule {
-    api_groups = ["apps"]
-    resources  = ["deployments", "statefulsets"]
-    verbs      = ["create", "delete", "get", "list", "patch", "update", "watch"]
-  }
-}
 
-resource "kubernetes_cluster_role_binding" "github_actions_rolebinding" {
-  metadata {
-    name = "github-actions-rolebinding"
-  }
-  role_ref {
-    api_group = "rbac.authorization.k8s.io"
-    kind      = "ClusterRole"
-    name      = kubernetes_cluster_role.github_actions_role.metadata[0].name
-  }
-  subject {
-    kind      = "ServiceAccount"
-    name      = kubernetes_service_account.github_actions.metadata[0].name
-    namespace = kubernetes_service_account.github_actions.metadata[0].namespace
-  }
-}
