@@ -1,6 +1,7 @@
 name: EKS Permissions Check
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - main
@@ -11,6 +12,10 @@ on:
 jobs:
   check-permissions:
     runs-on: ubuntu-latest
+
+    permissions:
+      id-token: write
+      contents: read
 
     steps:
     - name: Checkout repository
