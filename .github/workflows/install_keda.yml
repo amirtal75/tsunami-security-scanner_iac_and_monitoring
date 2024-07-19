@@ -1,10 +1,10 @@
-name: EKS Permissions Check
+name: install_keda
 
 on:
   workflow_dispatch:
 
 jobs:
-  install keda:
+  install_keda:
     runs-on: ubuntu-latest
 
     permissions:
