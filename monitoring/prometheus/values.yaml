@@ -1,4 +1,12 @@
 prometheus:
+  service:
+    type: LoadBalancer
+    labels:
+      app: prometheus
+    extraLabels:
+      app: prometheus
+    annotations:
+      service.beta.kubernetes.io/aws-load-balancer-backend-protocol: "tcp"
   prometheusSpec:
     serviceMonitorSelectorNilUsesHelmValues: false
     podMonitorSelectorNilUsesHelmValues: false
@@ -9,11 +17,6 @@ prometheus:
       matchLabels:
         release: prometheus-operator
     serviceAccountName: prometheus-operator-prometheus
-    service:
-      type: LoadBalancer
-      labels:
-        app: prometheus
     externalLabels:
       app: prometheus
-  extraLabels:
-    app: prometheus
+
