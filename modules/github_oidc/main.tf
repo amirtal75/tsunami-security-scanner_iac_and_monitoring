@@ -84,3 +84,35 @@ resource "kubernetes_cluster_role_binding" "github_actions" {
     namespace = kubernetes_service_account.github_actions.metadata[0].namespace
   }
 }
+
+resource "kubernetes_cluster_role" "github_actions_role" {
+  metadata {
+    name = "github-actions-role"
+  }
+  rule {
+    api_groups = [""]
+    resources  = ["pods", "services", "deployments", "serviceaccounts", "configmaps"]
+    verbs      = ["create", "delete", "get", "list", "patch", "update", "watch"]
+  }
+  rule {
+    api_groups = ["apps"]
+    resources  = ["deployments", "statefulsets"]
+    verbs      = ["create", "delete", "get", "list", "patch", "update", "watch"]
+  }
+}
+
+resource "kubernetes_cluster_role_binding" "github_actions_rolebinding" {
+  metadata {
+    name = "github-actions-rolebinding"
+  }
+  role_ref {
+    api_group = "rbac.authorization.k8s.io"
+    kind      = "ClusterRole"
+    name      = kubernetes_cluster_role.github_actions_role.metadata[0].name
+  }
+  subject {
+    kind      = "ServiceAccount"
+    name      = kubernetes_service_account.github_actions.metadata[0].name
+    namespace = kubernetes_service_account.github_actions.metadata[0].namespace
+  }
+}
