@@ -44,7 +44,8 @@ def main():
     #             key = key.strip()
     #             value = value.strip()
     #             tfvars[key] = value
-    sqs = boto3.client('sqs')
+    session = boto3.Session(region_name='us-west-2')
+    sqs = session.client('sqs')
     queue_name = 'tsunami_ip_list_queue'
     try:
         # Get the queue URL
