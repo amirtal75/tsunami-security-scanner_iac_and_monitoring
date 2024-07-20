@@ -45,7 +45,7 @@ def run_tsunami_scan(ip):
     try:
         result = subprocess.run(
             ["java", "-cp", "tsunami.jar:plugins/*", "-Dtsunami-config.location=tsunami.yaml",
-             "com.google.tsunami.main.cli.TsunamiCli", '--ip-v4-target', ip, '--log_level', 'FINEST'],
+             "com.google.tsunami.main.cli.TsunamiCli", '--ip-v4-target'],
             capture_output=True,
             text=True
         )
