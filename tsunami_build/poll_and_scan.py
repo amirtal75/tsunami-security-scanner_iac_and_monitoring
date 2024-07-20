@@ -50,6 +50,8 @@ def run_tsunami_scan(ip):
             capture_output=True,
             text=True
         )
+        logging.info(f"stdout: {result.stdout}")
+        logging.info(f"stderr: {result.stderr}")
         return result.stdout, result.stderr
     except Exception as e:
         logging.exception(f"unknown error while running the scan for the ip: {ip} with description:\n{e}")
