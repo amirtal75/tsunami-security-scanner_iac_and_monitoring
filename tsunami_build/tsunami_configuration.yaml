@@ -12,3 +12,4 @@ tsunami:
     stdout: true
     json: true
     json_output_path: /usr/tsunami/logs/tsunami_scan_output.json
+  verbose: true
