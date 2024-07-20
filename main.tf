@@ -62,6 +62,7 @@ module "github_oidc" {
   github_repo_name       = var.github_repo_name
   github_actions_role_name = var.github_actions_role_name
   github_actions_policy_name = var.github_actions_policy_name
+  cluster_oidc                = module.eks.cluster_oidc
 }
 
 resource "random_id" "bucket_suffix" {

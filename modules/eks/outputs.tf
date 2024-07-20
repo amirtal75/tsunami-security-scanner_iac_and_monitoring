@@ -21,3 +21,7 @@ output "cluster_name" {
 output "monitoring_security_group_arn" {
   value = aws_security_group.monitoring_security_group
 }
+
+output "cluster_oidc" {
+  value = aws_eks_cluster.eks_cluster.identity[0].oidc[0].issuer
+}

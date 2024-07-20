@@ -22,3 +22,8 @@ variable "github_actions_policy_name" {
   description = "IAM Policy name for GitHub Actions"
   type        = string
 }
+
+variable "cluster_oidc" {
+  description = "IAM Policy name for GitHub Actions"
+  type        = string
+}

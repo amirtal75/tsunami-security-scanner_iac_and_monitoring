@@ -11,6 +11,18 @@ resource "aws_iam_role" "github_actions_role" {
     Version = "2012-10-17",
     Statement = [
       {
+        "Effect": "Allow",
+        "Principal": {
+            "Federated": "arn:aws:iam::654654392619:oidc-provider/oidc.eks.us-west-2.amazonaws.com/id/CF5AA0FEA732CB79C49248DEE36EA77A"
+        },
+        "Action": "sts:AssumeRoleWithWebIdentity",
+        "Condition": {
+            "StringEquals": {
+                "oidc.eks.us-west-2.amazonaws.com/id/CF5AA0FEA732CB79C49248DEE36EA77A:sub": "system:serviceaccount:default:tsunami-scanner-sa"
+            }
+        }
+      },
+      {
         Effect = "Allow",
         Principal = {
           Federated = aws_iam_openid_connect_provider.github.arn
