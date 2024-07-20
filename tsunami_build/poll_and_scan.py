@@ -28,7 +28,8 @@ def get_messages_from_sqs(queue_url, batch_size):
     response = sqs_client.receive_message(
         QueueUrl=queue_url,
         MaxNumberOfMessages=batch_size,
-        WaitTimeSeconds=600
+        WaitTimeSeconds=20,
+        VisibilityTimeout=600
     )
     return response.get('Messages', [])
 
