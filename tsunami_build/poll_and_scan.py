@@ -43,6 +43,7 @@ def delete_message_from_sqs(queue_url, receipt_handle):
 
 def run_tsunami_scan(ip):
     try:
+        raise Exception
         result = subprocess.run(
             ["java", "-cp", "tsunami.jar:plugins/*", "-Dtsunami-config.location=tsunami.yaml",
              "com.google.tsunami.main.cli.TsunamiCli", '--ip-v4-target'],
@@ -52,6 +53,7 @@ def run_tsunami_scan(ip):
         return result.stdout, result.stderr
     except Exception as e:
         logging.exception(f"unknown error while running the scan for the ip: {ip} with description:\n{e}")
+        return "", "unknown error while running the scan for the ip: {ip} with description:\n{e}"
 
 
 def main():
@@ -92,9 +94,9 @@ def main():
             logging.info("Scan result: %s", stdout)
             if stderr:
                 logging.error("Scan error: %s", stderr)
-
-            delete_message_from_sqs(queue_url, receipt_handle)
-            logging.info("deleted message from sqs: %s", ip)
+            else:
+                delete_message_from_sqs(queue_url, receipt_handle)
+                logging.info("deleted message from sqs: %s", ip)
 
         time.sleep(scan_interval)
 
