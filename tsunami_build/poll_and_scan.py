@@ -73,7 +73,7 @@ def main():
     except ClientError as e:
         logging.error(f'Unexpected error: {e}')
     batch_size = int(os.getenv('BATCH_SIZE', '5'))
-    scan_interval = int(os.getenv('SCAN_INTERVAL', '300'))
+    scan_interval = int(os.getenv('SCAN_INTERVAL', '30'))
 
     while True:
         messages = get_messages_from_sqs(queue_url, batch_size)
