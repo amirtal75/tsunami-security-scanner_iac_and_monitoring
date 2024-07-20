@@ -1,0 +1,14 @@
+tsunami:
+  scanning:
+    plugins_directory: /usr/tsunami/plugins
+    network:
+      port_scanning:
+        enable: true
+      service_identification:
+        enable: true
+      vulndetection:
+        enable: true
+  output:
+    stdout: true
+    json: true
+    json_output_path: /usr/tsunami/logs/tsunami_scan_output.json
