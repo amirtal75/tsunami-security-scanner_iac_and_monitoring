@@ -45,7 +45,7 @@ def delete_message_from_sqs(queue_url, receipt_handle):
 def run_tsunami_scan(ip):
     try:
         result = subprocess.run(
-            ["java", "-cp", "tsunami.jar:plugins/*", "-Dtsunami-config.location=tsunami.yaml",
+            ["java", "-cp", "tsunami.jar:plugins/*", "-Dtsunami-config.location=tsunami_configuration.yaml",
              "com.google.tsunami.main.cli.TsunamiCli", '--ip-v4-target', ip],
             capture_output=True,
             text=True
