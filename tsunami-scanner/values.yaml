@@ -1,0 +1,45 @@
+replicaCount: 1
+
+image:
+  repository: amirtal75/tsunami-scanner
+  tag: v1.0.8
+  pullPolicy: Always
+
+service:
+  name: tsunami-scanner
+  namespace: default
+  ports:
+    - name: http
+      port: 80
+      targetPort: 80
+    - name: metrics
+      port: 8000
+      targetPort: 8000
+  annotations:
+    prometheus.io/scrape: 'true'
+    prometheus.io/port: '8000'
+    prometheus.io/path: '/metrics'
+  type: ClusterIP
+  port: 80
+
+resources:
+  limits:
+    cpu: 500m
+    memory: 2280Mi
+  requests:
+    cpu: 500m
+    memory: 2280Mi
+
+serviceAccount:
+  create: true
+  name: tsunami-scanner-sa
+  annotations:
+    eks.amazonaws.com/role-arn: arn:aws:iam::654654392619:role/github-actions-role
+  
+keda:
+  queueName: tsunami_ip_list_queue
+  queueRegion: us-west-2
+  queueLength: "5"
+  minReplicaCount: 1
+  maxReplicaCount: 10
+  serviceAccountName: keda-operator-sa

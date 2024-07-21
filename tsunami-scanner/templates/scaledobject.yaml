@@ -1,0 +1,14 @@
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: tsunami-scanner-scaler
+spec:
+  scaleTargetRef:
+    name: tsunami-scanner
+  minReplicaCount: {{ .Values.keda.minReplicaCount }}
+  maxReplicaCount: {{ .Values.keda.maxReplicaCount }}
+  triggers:
+    - type: aws-sqs-queue
+      metadata:
+        queueURL: "https://sqs.{{ .Values.keda.queueRegion }}.amazonaws.com/<account-id>/{{ .Values.keda.queueName }}"
+        queueLength: "{{ .Values.keda.queueLength }}"
