@@ -12,14 +12,13 @@ from prometheus_client import start_http_server, Gauge
 
 
 # Define Prometheus metrics
-classpath_scan_time_gauge = Gauge('tsunami_classpath_scan_time', 'Classpath scan time in minutes')
-nmap_scan_time_gauge = Gauge('tsunami_nmap_scan_time', 'Nmap scan time in minutes')
-port_scanning_time_gauge = Gauge('tsunami_port_scanning_time', 'Port scanning time in minutes')
-service_fingerprinting_time_gauge = Gauge('tsunami_service_fingerprinting_time', 'Service fingerprinting time in ms')
-service_fingerprinting_plugins_gauge = Gauge('tsunami_service_fingerprinting_plugins', 'Number of plugins used in service fingerprinting')
-vuln_detection_time_gauge = Gauge('tsunami_vuln_detection_time', 'Vulnerability detection time in ms')
-vuln_detection_plugins_gauge = Gauge('tsunami_vuln_detection_plugins', 'Number of plugins used in vulnerability detection')
-
+classpath_scan_time_gauge = Gauge('classpath_scan_time', 'Time taken for classpath scan')
+nmap_scan_time_gauge = Gauge('nmap_scan_time', 'Time taken for nmap scan')
+port_scanning_time_gauge = Gauge('port_scanning_time', 'Time taken for port scanning')
+service_fingerprinting_time_gauge = Gauge('service_fingerprinting_time', 'Time taken for service fingerprinting')
+service_fingerprinting_plugins_gauge = Gauge('service_fingerprinting_plugins', 'Number of plugins used for service fingerprinting')
+vuln_detection_time_gauge = Gauge('vuln_detection_time', 'Time taken for vulnerability detection')
+vuln_detection_plugins_gauge = Gauge('vuln_detection_plugins', 'Number of plugins used for vulnerability detection')
 
 def extract_values(text):
     values = {}
@@ -69,7 +68,6 @@ def setup_logging():
         ]
     )
 
-
 def get_messages_from_sqs(queue_url, batch_size):
     sqs_client = boto3.client('sqs')
     response = sqs_client.receive_message(
@@ -80,14 +78,12 @@ def get_messages_from_sqs(queue_url, batch_size):
     )
     return response.get('Messages', [])
 
-
 def delete_message_from_sqs(queue_url, receipt_handle):
     sqs_client = boto3.client('sqs')
     sqs_client.delete_message(
         QueueUrl=queue_url,
         ReceiptHandle=receipt_handle
     )
-
 
 def run_tsunami_scan(ip):
     try:
@@ -102,12 +98,21 @@ def run_tsunami_scan(ip):
         return result.stdout, result.stderr
     except Exception as e:
         logging.exception(f"unknown error while running the scan for the ip: {ip} with description:\n{e}")
-        return "", "unknown error while running the scan for the ip: {ip} with description:\n{e}"
+        return "", f"unknown error while running the scan for the ip: {ip} with description:\n{e}"
 
+def export_metrics(values):
+    classpath_scan_time_gauge.set(values['classpath_scan_time'])
+    nmap_scan_time_gauge.set(values['nmap_scan_time'])
+    port_scanning_time_gauge.set(values['port_scanning_time'])
+    service_fingerprinting_time_gauge.set(values['service_fingerprinting_time'])
+    service_fingerprinting_plugins_gauge.set(values['service_fingerprinting_plugins'])
+    vuln_detection_time_gauge.set(values['vuln_detection_time'])
+    vuln_detection_plugins_gauge.set(values['vuln_detection_plugins'])
 
 def main():
     setup_logging()
     start_http_server(8000)
+
     session = boto3.Session(region_name='us-west-2')
     sqs = session.client('sqs')
     queue_name = 'tsunami_ip_list_queue'
@@ -118,16 +123,19 @@ def main():
         logging.info(f'The URL for the queue "{queue_name}" is: {queue_url}')
     except sqs.exceptions.QueueDoesNotExist:
         logging.error(f'Error: The queue "{queue_name}" does not exist.')
+        return
     except (NoCredentialsError, PartialCredentialsError):
         logging.error('Error: AWS credentials not found or incomplete.')
+        return
     except ClientError as e:
         logging.error(f'Unexpected error: {e}')
+        return
     batch_size = int(os.getenv('BATCH_SIZE', '5'))
     scan_interval = int(os.getenv('SCAN_INTERVAL', '30'))
 
     while True:
         messages = get_messages_from_sqs(queue_url, batch_size)
-        start_http_server(8000)
+
         if not messages:
             logging.info("No messages found")
             time.sleep(scan_interval)
@@ -144,22 +152,13 @@ def main():
             if stderr:
                 logging.error("Scan error: %s", stderr)
                 values = extract_values(stderr)
+                export_metrics(values)
                 logging.info(f"metrics to export: \n{values}")
-
-                # Set Prometheus metrics
-                classpath_scan_time_gauge.set(values['classpath_scan_time'])
-                nmap_scan_time_gauge.set(values['nmap_scan_time'])
-                port_scanning_time_gauge.set(values['port_scanning_time'])
-                service_fingerprinting_time_gauge.set(values['service_fingerprinting_time'])
-                service_fingerprinting_plugins_gauge.set(values['service_fingerprinting_plugins'])
-                vuln_detection_time_gauge.set(values['vuln_detection_time'])
-                vuln_detection_plugins_gauge.set(values['vuln_detection_plugins'])
             else:
                 delete_message_from_sqs(queue_url, receipt_handle)
                 logging.info("deleted message from sqs: %s", ip)
 
         time.sleep(scan_interval)
-
 
 if __name__ == "__main__":
     main()
