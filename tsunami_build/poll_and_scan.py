@@ -19,6 +19,7 @@ service_fingerprinting_time_gauge = Gauge('service_fingerprinting_time', 'Time t
 service_fingerprinting_plugins_gauge = Gauge('service_fingerprinting_plugins', 'Number of plugins used for service fingerprinting', ['ip'])
 vuln_detection_time_gauge = Gauge('vuln_detection_time', 'Time taken for vulnerability detection', ['ip'])
 vuln_detection_plugins_gauge = Gauge('vuln_detection_plugins', 'Number of plugins used for vulnerability detection', ['ip'])
+failed_run = Gauge('failed_run', 'Number of failed scans', ['ip'])
 
 
 def extract_values(text):
@@ -109,6 +110,7 @@ def export_metrics(values, ip):
     service_fingerprinting_plugins_gauge.labels(ip=ip).set(values['service_fingerprinting_plugins'])
     vuln_detection_time_gauge.labels(ip=ip).set(values['vuln_detection_time'])
     vuln_detection_plugins_gauge.labels(ip=ip).set(values['vuln_detection_plugins'])
+    failed_run.labels(ip=ip).set(values['failed_run'])
 
 def main():
     setup_logging()
@@ -148,16 +150,20 @@ def main():
 
             logging.info(f"Scanning IP: {ip}")
             stdout, stderr = run_tsunami_scan(ip)
-
+            succ_values = {}
             logging.info("Scan result: %s", stdout)
             if stderr:
                 logging.error("Scan error: %s", stderr)
-                values = extract_values(stderr)
-                export_metrics(values, ip)
-                logging.info(f"metrics to export: \n{values}")
-
-            delete_message_from_sqs(queue_url, receipt_handle)
-            logging.info("deleted message from sqs: %s", ip)
+                err_values = extract_values(stderr)
+                err_values['failed_run'] = 1
+                export_metrics(err_values, ip)
+                logging.info(f"metrics to export: \n{err_values}")
+            else:
+                delete_message_from_sqs(queue_url, receipt_handle)
+                logging.info("deleted message from sqs: %s", ip)
+                succ_values ['failed_run'] = 0
+                export_metrics(succ_values, ip)
+                logging.info(f"metrics to export: \n{succ_values}")
 
         time.sleep(scan_interval)
 
