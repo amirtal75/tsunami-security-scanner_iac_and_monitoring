@@ -12,13 +12,14 @@ from prometheus_client import start_http_server, Gauge
 
 
 # Define Prometheus metrics
-classpath_scan_time_gauge = Gauge('classpath_scan_time', 'Time taken for classpath scan')
-nmap_scan_time_gauge = Gauge('nmap_scan_time', 'Time taken for nmap scan')
-port_scanning_time_gauge = Gauge('port_scanning_time', 'Time taken for port scanning')
-service_fingerprinting_time_gauge = Gauge('service_fingerprinting_time', 'Time taken for service fingerprinting')
-service_fingerprinting_plugins_gauge = Gauge('service_fingerprinting_plugins', 'Number of plugins used for service fingerprinting')
-vuln_detection_time_gauge = Gauge('vuln_detection_time', 'Time taken for vulnerability detection')
-vuln_detection_plugins_gauge = Gauge('vuln_detection_plugins', 'Number of plugins used for vulnerability detection')
+classpath_scan_time_gauge = Gauge('classpath_scan_time', 'Time taken for classpath scan', ['ip'])
+nmap_scan_time_gauge = Gauge('nmap_scan_time', 'Time taken for nmap scan', ['ip'])
+port_scanning_time_gauge = Gauge('port_scanning_time', 'Time taken for port scanning', ['ip'])
+service_fingerprinting_time_gauge = Gauge('service_fingerprinting_time', 'Time taken for service fingerprinting', ['ip'])
+service_fingerprinting_plugins_gauge = Gauge('service_fingerprinting_plugins', 'Number of plugins used for service fingerprinting', ['ip'])
+vuln_detection_time_gauge = Gauge('vuln_detection_time', 'Time taken for vulnerability detection', ['ip'])
+vuln_detection_plugins_gauge = Gauge('vuln_detection_plugins', 'Number of plugins used for vulnerability detection', ['ip'])
+
 
 def extract_values(text):
     values = {}
@@ -100,14 +101,14 @@ def run_tsunami_scan(ip):
         logging.exception(f"unknown error while running the scan for the ip: {ip} with description:\n{e}")
         return "", f"unknown error while running the scan for the ip: {ip} with description:\n{e}"
 
-def export_metrics(values):
-    classpath_scan_time_gauge.set(values['classpath_scan_time'])
-    nmap_scan_time_gauge.set(values['nmap_scan_time'])
-    port_scanning_time_gauge.set(values['port_scanning_time'])
-    service_fingerprinting_time_gauge.set(values['service_fingerprinting_time'])
-    service_fingerprinting_plugins_gauge.set(values['service_fingerprinting_plugins'])
-    vuln_detection_time_gauge.set(values['vuln_detection_time'])
-    vuln_detection_plugins_gauge.set(values['vuln_detection_plugins'])
+def export_metrics(values, ip):
+    classpath_scan_time_gauge.labels(ip=ip).set(values['classpath_scan_time'])
+    nmap_scan_time_gauge.labels(ip=ip).set(values['nmap_scan_time'])
+    port_scanning_time_gauge.labels(ip=ip).set(values['port_scanning_time'])
+    service_fingerprinting_time_gauge.labels(ip=ip).set(values['service_fingerprinting_time'])
+    service_fingerprinting_plugins_gauge.labels(ip=ip).set(values['service_fingerprinting_plugins'])
+    vuln_detection_time_gauge.labels(ip=ip).set(values['vuln_detection_time'])
+    vuln_detection_plugins_gauge.labels(ip=ip).set(values['vuln_detection_plugins'])
 
 def main():
     setup_logging()
@@ -152,11 +153,11 @@ def main():
             if stderr:
                 logging.error("Scan error: %s", stderr)
                 values = extract_values(stderr)
-                export_metrics(values)
+                export_metrics(values, ip)
                 logging.info(f"metrics to export: \n{values}")
-            else:
-                delete_message_from_sqs(queue_url, receipt_handle)
-                logging.info("deleted message from sqs: %s", ip)
+
+            delete_message_from_sqs(queue_url, receipt_handle)
+            logging.info("deleted message from sqs: %s", ip)
 
         time.sleep(scan_interval)
 
