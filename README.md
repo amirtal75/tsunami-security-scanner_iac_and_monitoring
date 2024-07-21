@@ -2,7 +2,7 @@
 
 # how to deploy the solution:
     # 0. install packages for python3, git, terraform
-    # 1. clone the repo
+    # 1. clone the repo https://github.com/amirtal75/tsunami-security-scanner_iac_and_monitoring.git
     # 2. configure your local env in aws cli with aws credentials in sufficient permissions
     # 3. make sure that aws credentials are for a dev account
     # 4. cd env_setup_and_clean and run create_terraform_backend_with_arn.py 
