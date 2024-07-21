@@ -20,6 +20,7 @@ service_fingerprinting_plugins_gauge = Gauge('service_fingerprinting_plugins', '
 vuln_detection_time_gauge = Gauge('vuln_detection_time', 'Time taken for vulnerability detection', ['ip'])
 vuln_detection_plugins_gauge = Gauge('vuln_detection_plugins', 'Number of plugins used for vulnerability detection', ['ip'])
 failed_run = Gauge('failed_run', 'Number of failed scans', ['ip'])
+total_scan_time_seconds = Gauge('total_scan_time_seconds', 'total_scan_time_seconds', ['ip'])
 
 
 def extract_values(text):
@@ -147,7 +148,7 @@ def main():
         for message in messages:
             receipt_handle = message['ReceiptHandle']
             ip = message['Body']
-
+            start_time = time.time()
             logging.info(f"Scanning IP: {ip}")
             stdout, stderr = run_tsunami_scan(ip)
             succ_values = {}
@@ -164,6 +165,9 @@ def main():
                 succ_values ['failed_run'] = 0
                 export_metrics(succ_values, ip)
                 logging.info(f"metrics to export: \n{succ_values}")
+            end_time = time.time()
+            duration = end_time - start_time
+            total_scan_time_seconds.labels(ip=ip).set(duration)
 
         time.sleep(scan_interval)
 

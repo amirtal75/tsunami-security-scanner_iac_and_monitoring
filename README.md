@@ -49,6 +49,8 @@
     # 3. understand how to configure fluent.d to feed coralogix and move the custom metrics creation to there from the app logs insterad of the python script
     # 4. track performance to optimize pod resource request and limit strategy and the scaling object logic
 # Think of more stuff as I go....
+    # 1. add dead letter_queue
+    # 2. Update helm charts to support full configuration of scraping and authentication for grafana and prometheus
 # Cleanup
     # 1. terraform destroy (may be stuck in a few phases and need some manual delete of security-groups ot nat depnds on the way the helm was deployed)
     # 2. python env_setup_and_clean\cleanup_terraform_backend_with_arn.py
